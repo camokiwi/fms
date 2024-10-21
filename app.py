@@ -261,14 +261,17 @@ def add_paddock():
 @app.route("/paddock/insert", methods=['POST'])
 def paddock_insert():
     connection = None # set initial value, otherwise it keeps giving me error
-    cursor = None     # set initial value, otherwise it keeps giving me error
+    cursor = None  # set initial value, otherwise it keeps giving me error
     try:
         connection = get_db_connection() # connect with database
-        cursor = connection.cursor() 
-        name = request.form['name']         # assign values to the variable
+        cursor = connection.cursor()
+        name = request.form['name']  # assign values to the variable
         area = float(request.form['area'])  # assign values to the variable, convert the type to float
-        dm_per_ha = float(request.form['dm_per_ha'])   # assign values to the variable, convert the type to float
-        total_dm = area * dm_per_ha         # calculate total DM as requested
+        dm_per_ha = float(request.form['dm_per_ha'])  # assign values to the variable, convert the type to float
+        total_dm = area * dm_per_ha    # calculate total DM as requested
+        
+        # something is not right, add return value here to check the return value in the terminal
+        print(f"Debug - Inserting paddock: name={name}, area={area}, dm_per_ha={dm_per_ha}, total_dm={total_dm}")
 
         query = """    
             INSERT INTO paddocks (name, area, dm_per_ha, total_dm)
@@ -277,10 +280,18 @@ def paddock_insert():
         cursor.execute(query, (name, area, dm_per_ha, total_dm))
         connection.commit()
          
-        new_id = cursor.lastrowid   # get the new id of the newly created paddock
+        new_id = cursor.lastrowid # get the new id of the newly created paddock
+        
+        # Verify the inserted data
+        verify_query = "SELECT * FROM paddocks WHERE id = %s"
+        cursor.execute(verify_query, (new_id,))
+        inserted_paddock = cursor.fetchone()
+        print(f"Debug - Inserted paddock: {inserted_paddock}")  # something is not right, add return value here to check the return value in the terminal
+        
         return redirect(f"/paddock?id={new_id}")  # use that id to navigate to the new paddock's page
     except Exception as e:
-        flash(f"Error adding paddock: {str(e)}")   # error hanlding 
+        print(f"Debug - Error in paddock_insert: {str(e)}")    # something is not right, add return value here to check the return value in the terminal
+        flash(f"Error adding paddock: {str(e)}")  # error hanlding 
         return redirect("/paddock/add")
     finally:
         if cursor:
@@ -291,9 +302,9 @@ def paddock_insert():
 # new paddock route 
 @app.route("/paddock")
 def paddock():
-    id = request.args.get('id')       # get id from record detail page in the URL
+    id = request.args.get('id')   # get id from record detail page in the URL
     if 'curr_date' not in session:
-        session['curr_date'] = start_date  # assign value to the variable
+        session['curr_date'] = start_date   # assign value to the variable
     
     if isinstance(session['curr_date'], str):
         current_date = datetime.strptime(session['curr_date'], "%Y-%m-%d").replace(tzinfo=None)
@@ -305,7 +316,7 @@ def paddock():
     connection = None
     cursor = None
     try:
-        connection = get_db_connection()  # connect with database
+        connection = get_db_connection()    # connect with database
         cursor = connection.cursor(dictionary=True)
         query = """
         SELECT p.*, COALESCE(m.name, 'No Mob') AS mob_name,
@@ -313,19 +324,22 @@ def paddock():
         FROM paddocks p
         LEFT JOIN mobs m ON p.id = m.paddock_id
         WHERE p.id = %s
-        """  # SQL get paddock details and all the mod details too
-        cursor.execute(query, (id,)) # run it 
-        paddock = cursor.fetchone() # extract paddock info
+        """   # SQL get paddock details and all the mod details too
+        cursor.execute(query, (id,))  # run it 
+        paddock = cursor.fetchone()  # extract paddock info
         
         if paddock:
-            growth = paddock['area'] * pasture_growth_rate * daysPassed2 # calculate new pasture growth value
+            print(f"Debug - Retrieved paddock: {paddock}")
+            growth = paddock['area'] * pasture_growth_rate * daysPassed2  # calculate new pasture growth value
             consumption = paddock['stock_count'] * stock_consumption_rate * daysPassed2 # calculate new consumption value
             paddock['current_total_dm'] = paddock['total_dm'] + growth - consumption
-            return render_template("paddock.html", paddock=paddock, current_date=current_date) # back to paddock.html page with connected variable values
+            print(f"Debug - Calculated values: growth={growth}, consumption={consumption}, current_total_dm={paddock['current_total_dm']}")
+            return render_template("paddock.html", paddock=paddock, current_date=current_date)   # back to paddock.html page with connected variable values
         else:
-            flash("Paddock not found")    # error handling 
+            flash("Paddock not found")
             return redirect("/paddocks")
     except Exception as e:
+        print(f"Debug - Error in paddock route: {str(e)}")     # error handling 
         flash(f"Error retrieving paddock: {str(e)}")
         return redirect("/paddocks")
     finally:

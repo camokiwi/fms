@@ -23,12 +23,8 @@
         <td>{{ paddock['dm_per_ha'] }}</td>
     </tr>
     <tr>
-        <th>Initial Total DM (kg)</th>
-        <td>{{ paddock['total_dm'] }}</td>
-    </tr>
-    <tr>
-        <th>Current Total DM (kg)</th>
-        <td>{{ paddock['current_total_dm'] | round(2) }}</td>
+        <th>Total DM (kg)</th>
+        <td>{{ paddock['total_dm'] | round(2) }}</td>
     </tr>
 </table>
 {% else %}
