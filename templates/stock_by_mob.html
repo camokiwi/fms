@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Stock by Mob{% endblock %}
+
+{% block content %}
+<h2>Stock by Mob</h2>
+
+{% for mob in grouped_stock.values() %}
+    <h3>{{ mob['mob_name'] }} - Paddock: {{ mob['paddock_name'] }}</h3>
+    
+    <ul>
+        <li><strong>Number of Stock:</strong> {{ mob['animal_count'] }}</li>
+        <li><strong>Average Weight:</strong> {{ mob['average_weight']|round(2) }} kg</li>
+    </ul>
+
+    <table class="table table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Animal's ID</th>
+            <th>Age in Years</th>
+            <th>Weight in kg</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for animal in mob['animals'] %}
+        <tr>
+            <td>{{ animal['animalId'] }}</td>
+            <td>{{ animal['animalAge'] }}</td>
+            <td>{{ animal['animalWeight'] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endfor %}
+
+{% endblock %}

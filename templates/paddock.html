@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Paddock Details{% endblock %}
+{% block content %}
+
+<h2>Paddock Details</h2>
+
+{% if paddock %}
+<table class="table table-striped table-bordered">
+    <tr>
+        <th>ID</th>
+        <td>{{ paddock['id'] }}</td>
+    </tr>
+    <tr>
+        <th>Name</th>
+        <td>{{ paddock['name'] }}</td>
+    </tr>
+    <tr>
+        <th>Area (ha)</th>
+        <td>{{ paddock['area'] }}</td>
+    </tr>
+    <tr>
+        <th>DM per ha (kg)</th>
+        <td>{{ paddock['dm_per_ha'] }}</td>
+    </tr>
+    <tr>
+        <th>Initial Total DM (kg)</th>
+        <td>{{ paddock['total_dm'] }}</td>
+    </tr>
+    <tr>
+        <th>Current Total DM (kg)</th>
+        <td>{{ paddock['current_total_dm'] | round(2) }}</td>
+    </tr>
+</table>
+{% else %}
+<p class="alert alert-warning">Paddock not found.</p>
+{% endif %}
+
+<a href="{{ url_for('paddocks') }}" class="btn btn-secondary mt-3">Back to Paddock List</a>
+{% endblock %}
