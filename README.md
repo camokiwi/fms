@@ -87,6 +87,8 @@ Database interactions:
 * UPDATE query to move the selected mob to the selected new paddock.
 Uses flash() to let end users know the success or failure of the move operation.
 Template interaction: Renders mobs.html with mob data and available paddocks.
+I understand in the requirement it says to create a new route for move mob. But I really think
+it's nothing but duplicating. We can get two things done on the same page, also users can view mobs details and perform moving mobs function on the same page too.
 
 5. Move Date Forward Route - @app.route("/move-date-forward")
 Specific functionality:
